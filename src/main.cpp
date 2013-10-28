@@ -4,98 +4,149 @@
 #include <GL/glu.h>
 #include <GL/glut.h>
 #include "textures.h"
+#include "game.h"
+
+#define MAX 22
 
 using namespace std;
 
 Textures *texture = new Textures();
+Level *level1 = new Level(); 
+Mario *mario = new Mario();
 
-unsigned int basewalltex,bricktex,pipetex;
-unsigned int mariotex,questiontex,enemytex;
-unsigned int cloudtex,bushtex,hilltex;
+int jumpFlag=0,up=0,down;
+bool direction[4] = {0,0,0,0};
+
+void die(){
+    exit(1);
+}
+
+void createLevel(){
+    for(int i=0;i<MAX;i++){ 
+        // level1->baseWall[i] = (i%7);
+        level1->baseWall[i] = 1;
+        level1->pipe[i] = (i%5==0);
+        if(level1->pipe[i-1]==1 && ((i-1)%5==0))
+            level1->pipe[i]=1;
+    }
+    level1->pipe[0]=0;
+}
+
+void moveBack(){
+    if(level1->pipe[(mario->mariox-1)/64]){
+        if(mario->marioy/64>=3)
+            mario->mariox-=4;
+        else
+            mario->mariox=mario->mariox;
+    }
+    else if(level1->baseWall[(mario->mariox+31)/64])
+        mario->mariox-=4;
+    else
+        die();
+}
+
+void moveFront(){
+    if(level1->pipe[(mario->mariox+65)/64]){
+        if(mario->marioy/64>=3)
+            mario->mariox+=4;
+        else
+            mario->mariox=mario->mariox;
+    }
+    else if(level1->baseWall[(mario->mariox+33)/64])
+        mario->mariox+=4;
+    else if(mario->marioy)
+        mario->mariox+=4;
+    else
+        die();
+}
+
+void moveUp(){
+    if(!jumpFlag){
+        jumpFlag=mario->marioy+224;
+        up=1;
+    }
+    if(jumpFlag && (mario->marioy<=jumpFlag) && up)
+        mario->marioy+=4;
+    else
+        up=0;
+    if(!up)
+    {
+        if(level1->pipe[(mario->mariox+64)/64] || level1->pipe[(mario->mariox+4)/64]){
+            mario->base=1;
+            if(mario->marioy>=188)
+                mario->marioy-=4;
+            if(mario->marioy==192){
+                direction[2]=0;
+                jumpFlag=0;
+            }
+        }
+
+        else if(!(level1->pipe[(mario->mariox+64)/64]) || !(level1->pipe[(mario->mariox+4)/64]) ){
+            mario->base=0;
+            if(mario->marioy>=4)
+                mario->marioy-=4;
+            if(mario->marioy==0){
+                direction[2]=0;
+                jumpFlag=0;
+            }
+        }
+    }
+}
+
+void moveDown(){
+}
 
 void init()
 {
-	glClearColor(0.48,0.47,1.0,1.0);	
+    glClearColor(0.48,0.47,1.0,1.0);	
     glOrtho(0.0,1360.0,0.0,760.0,-10.0,10.0);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_TEXTURE_2D);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_TEXTURE_2D);
 }
 
 void display()
 {
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     GLint startx=0,starty=0;
-    for(int i=0;i<22;i++)
+
+    // cout<<mario->marioy/64<<endl;
+    for(int i=0;i<MAX;i++)
     {
-        texture->drawBaseWall(startx, starty);
+        if(level1->baseWall[i])
+            texture->drawBaseWall(startx, starty);
+        if(level1->pipe[i] && (i%5==0))
+            texture->drawPipe(startx, starty);
         startx+=64;
     }
 
-    //Draw Base-wall
-    // for(int i=0;i<22;i++){
-
-    //     drawBase(startx, starty);
-
-    //     if(i==5){
-    //         drawSmallCloud(startx, starty);
-    //         drawBush(startx, starty);
-    //     }
-
-    //     glPushMatrix();
-    //     if(i==10){
-    //         // glTranslatef(-x,0,0);
-    //         drawEnemy(startx, starty);
-    //     }
-    //     glPopMatrix();
-
-    //     if(i==13){
-    //         drawSmallHill(startx, starty);
-    //     }
-
-    //     if(i==16){
-    //         drawPipe(startx, starty);
-    //     }
-
-    //     if(i>=9 && i<=13)
-    //     {
-    //         if(i%2)
-    //             drawBrick(startx, starty);
-    //         else
-    //             drawQuestion(startx, starty);
-    //     }
-
-    //     startx+=64;
-    // }
-
     glPushMatrix();
-    // glTranslatef(mario->mariox,mario->marioy,0);
-    texture->drawMario(64, 0);
+        glTranslatef(mario->mariox,mario->marioy,0);
+        texture->drawMario(0, 0);
     glPopMatrix();
-    // x+=2;
+
+    
 }
 
 int main(int argc, char** argv)
 {
-    bool direction[4] = {0,0,0,0};
-    int jumpFlag=0;
-    // mario->mariox=0;
-    // mario->marioy=0;
+    mario->mariox=832;
+    mario->marioy=0;
+    mario->base=0;
 
-	SDL_Init(SDL_INIT_EVERYTHING);
-	SDL_Surface *screen;
-	screen = SDL_SetVideoMode(1344, 768, 32, SDL_SWSURFACE|SDL_OPENGL | SDL_FULLSCREEN);
-	// screen = SDL_SetVideoMode(1344, 768, 32, SDL_SWSURFACE|SDL_OPENGL );
-	bool running = true;
-	const int FPS = 30;
-	Uint32 start;
-	SDL_Event event;
+    SDL_Init(SDL_INIT_EVERYTHING);
+    SDL_Surface *screen;
+    // screen = SDL_SetVideoMode(1344, 768, 32, SDL_SWSURFACE|SDL_OPENGL | SDL_FULLSCREEN);
+    screen = SDL_SetVideoMode(1344, 768, 32, SDL_SWSURFACE|SDL_OPENGL );
+    bool running = true;
+    const int FPS = 30;
+    Uint32 start;
+    SDL_Event event;
 
-    // createLevel();
+    createLevel();
 
-	init();
+    init();
 
     while(running) {
         start = SDL_GetTicks();
@@ -117,16 +168,16 @@ int main(int argc, char** argv)
                             direction[1]=1;
                             break;
                         case SDLK_UP:
-                            jumpFlag=0;
+                            // jumpFlag=0;
                             direction[2]=1;
                             break;
                         case SDLK_DOWN:
-                            if(direction[2]==0)
-                                direction[3]=1;
+                            // if(direction[2]==0)
+                            direction[3]=1;
                             break;
                     }
                     break;
-                 case SDL_KEYUP:
+                case SDL_KEYUP:
                     switch(event.key.keysym.sym)
                     {
                         case SDLK_LEFT:
@@ -135,13 +186,13 @@ int main(int argc, char** argv)
                         case SDLK_RIGHT:
                             direction[1]=0;
                             break;
-                         case SDLK_UP:
+                        case SDLK_UP:
                             // direction[2]=0;
-                            jumpFlag=0;
+                            // jumpFlag=0;
                             break;
                         case SDLK_DOWN:
-                            if(jumpFlag==1)
-                                direction[3]=0;
+                            // if(jumpFlag==1)
+                            direction[3]=0;
                             break;
                     }
                     break; 
@@ -149,47 +200,28 @@ int main(int argc, char** argv)
         }
 
         if(direction[0])
-            // moveBack();
-            // mariox-=5;
+            moveBack();
+        // mariox-=5;
 
         if(direction[1])
-            // moveFront();
-            // mariox+=5;
+            moveFront();
+        // mariox+=5;
 
         if(direction[2])
-        {
-            // // cout<<marioy<<endl;
-            // if(marioy<=258){
-            //     marioy+=5;
-            //     direction[2]=1;
-            // }
-            // else{
-            //     direction[2]=0;
-            //     direction[3]=1;
-            // }
-
-        }
+            moveUp();
 
         if(direction[3])
-        {
-            // if(marioy>0)
-            //     marioy-=5;
-            // else
-            // {
-            //    direction[3]=0; 
-            //    jumpFlag=1;
-            // }
-        }
+            moveDown();
 
-		display();
-		SDL_GL_SwapBuffers();
-		// angle += 0.9;
-		// if(angle > 360)
-		// 	angle -= 360;
-		if(1000/FPS > SDL_GetTicks()-start)
-			SDL_Delay(1000/FPS-(SDL_GetTicks()-start));
-	}
-	//SDL_Quit();
-	atexit(SDL_Quit);
-	return 0;
+        display();
+        SDL_GL_SwapBuffers();
+        // angle += 0.9;
+        // if(angle > 360)
+        // 	angle -= 360;
+        if(1000/FPS > SDL_GetTicks()-start)
+            SDL_Delay(1000/FPS-(SDL_GetTicks()-start));
+    }
+    //SDL_Quit();
+    atexit(SDL_Quit);
+    return 0;
 }
