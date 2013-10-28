@@ -33,29 +33,33 @@ void createLevel(){
 }
 
 void moveBack(){
+    if(level1->pipe[(mario->mariox)/64]==0 && mario->base)
+        direction[3]=1;
     if(level1->pipe[(mario->mariox-1)/64]){
         if(mario->marioy/64>=3)
-            mario->mariox-=4;
+            mario->mariox-=8;
         else
             mario->mariox=mario->mariox;
     }
     else if(level1->baseWall[(mario->mariox+31)/64])
-        mario->mariox-=4;
+        mario->mariox-=8;
     else
         die();
 }
 
 void moveFront(){
+    if(level1->pipe[(mario->mariox)/64]==0 && mario->base)
+        direction[3]=1;
     if(level1->pipe[(mario->mariox+65)/64]){
         if(mario->marioy/64>=3)
-            mario->mariox+=4;
+            mario->mariox+=8;
         else
             mario->mariox=mario->mariox;
     }
     else if(level1->baseWall[(mario->mariox+33)/64])
-        mario->mariox+=4;
+        mario->mariox+=8;
     else if(mario->marioy)
-        mario->mariox+=4;
+        mario->mariox+=8;
     else
         die();
 }
@@ -66,7 +70,7 @@ void moveUp(){
         up=1;
     }
     if(jumpFlag && (mario->marioy<=jumpFlag) && up)
-        mario->marioy+=4;
+        mario->marioy+=8;
     else
         up=0;
     if(!up)
@@ -74,17 +78,16 @@ void moveUp(){
         if(level1->pipe[(mario->mariox+64)/64] || level1->pipe[(mario->mariox+4)/64]){
             mario->base=1;
             if(mario->marioy>=188)
-                mario->marioy-=4;
+                mario->marioy-=8;
             if(mario->marioy==192){
                 direction[2]=0;
                 jumpFlag=0;
             }
         }
-
         else if(!(level1->pipe[(mario->mariox+64)/64]) || !(level1->pipe[(mario->mariox+4)/64]) ){
             mario->base=0;
             if(mario->marioy>=4)
-                mario->marioy-=4;
+                mario->marioy-=8;
             if(mario->marioy==0){
                 direction[2]=0;
                 jumpFlag=0;
@@ -94,6 +97,14 @@ void moveUp(){
 }
 
 void moveDown(){
+    if(level1->pipe[(mario->mariox)/64]==0 && level1->pipe[(mario->mariox+64)/64]==0){
+        if(mario->marioy>0)
+            mario->marioy-=8;
+        else{
+            mario->base=0;
+            direction[3]=0;
+        }
+    }
 }
 
 void init()
@@ -125,20 +136,18 @@ void display()
         glTranslatef(mario->mariox,mario->marioy,0);
         texture->drawMario(0, 0);
     glPopMatrix();
-
-    
 }
 
 int main(int argc, char** argv)
 {
-    mario->mariox=832;
+    mario->mariox=0;
     mario->marioy=0;
     mario->base=0;
 
     SDL_Init(SDL_INIT_EVERYTHING);
     SDL_Surface *screen;
-    // screen = SDL_SetVideoMode(1344, 768, 32, SDL_SWSURFACE|SDL_OPENGL | SDL_FULLSCREEN);
-    screen = SDL_SetVideoMode(1344, 768, 32, SDL_SWSURFACE|SDL_OPENGL );
+    screen = SDL_SetVideoMode(1344, 768, 32, SDL_SWSURFACE|SDL_OPENGL | SDL_FULLSCREEN);
+    // screen = SDL_SetVideoMode(1344, 768, 32, SDL_SWSURFACE|SDL_OPENGL );
     bool running = true;
     const int FPS = 30;
     Uint32 start;
