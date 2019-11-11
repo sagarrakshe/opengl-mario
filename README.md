@@ -1,8 +1,8 @@
-### Super Mario
+### Super Mario Game
 
-Super Mario game implemented in C++ using OpenGL.
+Super Mario Game implemented in C++ using OpenGL and SDL.
 
-![super-mario](https://raw.github.com/sagarrakshe/opengl-mario/master/media/super-mario.png)
+![super-mario](https://raw.github.com/t0xic0der/opengl-mario/master/media/super-mario.png)
 
 ### Prerequisites
 
