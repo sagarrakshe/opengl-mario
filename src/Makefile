@@ -1,5 +1,4 @@
 # Makefile
-# sagar, 2013-10-27 18:35
 
 LIBS = -lglut -lGL -lGLU -lSDL -lSDL_image
 objects = main.o textures.o game.o

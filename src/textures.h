@@ -1,9 +1,3 @@
-/*
- * textures.h
- * Copyright (C) 2013 sagar <sagar@sagar-liquid>
- *
- */
-
 #ifndef __TEXTURES_H__
 #define __TEXTURES_H__
 

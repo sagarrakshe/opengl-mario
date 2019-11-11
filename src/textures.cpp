@@ -1,8 +1,3 @@
-/*
- * Author:  Sagar Rakshe <sagarrakshe2@gmail.com>
- * Date:    2013-10-25 12:33
- */
-
 #include "textures.h"
 
 unsigned int Textures::loadTexture(const char* filename)
