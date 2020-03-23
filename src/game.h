@@ -1,9 +1,3 @@
-/*
- * game.h
- * Copyright (C) 2013 sagar <sagar@sagar-liquid>
- *
- */
-
 #ifndef __GAME_H__
 #define __GAME_H__
 

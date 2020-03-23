@@ -1,9 +1,10 @@
 #! /bin/bash
 #
 # install.sh
-# Copyright (C) 2013 sagar <sagar@sagar-liquid>
-#
+# 
 
+echo "Ubuntu Dependency Installer for super-mario-basics"
+echo "Written by Akashdeep Dhar"
 
 echo "Installing freeglut..."
 sudo apt-get install freeglut3-dev

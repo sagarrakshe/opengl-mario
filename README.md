@@ -1,18 +1,22 @@
-### Super Mario
+# Super Mario Game
+v0.01
 
-Super Mario game implemented in C++ using OpenGL.
+Super Mario Game implemented in C++ using OpenGL and SDL.
 
-![super-mario](https://raw.github.com/sagarrakshe/opengl-mario/master/media/super-mario.png)
+![super-mario](https://raw.github.com/t0xic0der/opengl-mario/master/media/super-mario.png)
 
-### Prerequisites
+## Prerequisites
+You need `freeglut` and `SDL` libraries. 
 
-You need `freeglut` and `SDL` libraries. Execute the `install.sh` to install them.
+## Fedora users 
+Execute the `fedora-dep.sh` in terminal to install them.
 
-    $ sh install.sh 
+## Ubuntu users
+Execute the `ubuntu-dep.sh` in terminal to install them.
 
 ### Usage
 
-    $ git clone https://github.com/sagarrakshe/opengl-mario 
+    $ git clone https://github.com/t0xic0der/opengl-mario 
     $ cd opengl-mario/src
     $ make
     $ ./mario
